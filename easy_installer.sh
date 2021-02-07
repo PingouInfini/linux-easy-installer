@@ -11,7 +11,7 @@ check_if_package_installed () {
 }
 
 get_version_of_package() {
-  aptitude versions $1 |head -2 |tail -1 | awk '{print $2}'
+  aptitude versions "$1" |head -2 |tail -1 | awk '{print $2}'
 }
 
 # Isntallation de docker, avec version en parametre $1
@@ -44,41 +44,49 @@ install_docker() {
   sudo systemctl restart docker
 
   #install docker-compose
-  sudo curl -L "https://github.com/docker/compose/releases/download/"$1"/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  sudo curl -L "https://github.com/docker/compose/releases/download/""$1""/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
   sudo chmod +x /usr/local/bin/docker-compose
   sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 
   #add current user to docker group
-  sudo usermod -aG docker $USER
+  sudo usermod -aG docker "$USER"
 }
 
 install_python3() {
-  sudo apt install python3
-  sudo apt install python3-pip
+  sudo apt install -y python3
+  sudo apt install -y python3-pip
 }
 
 install_openjdk8() {
   sudo add-apt-repository ppa:openjdk-r/ppa
   sudo apt-get update
-  sudo apt-get install openjdk-8-jdk
+  sudo apt-get install -y openjdk-8-jdk
 }
 
 install_openjdk8() {
-  sudo apt install nodejs
+  sudo add-apt-repository ppa:openjdk-r/ppa
+  sudo apt-get update
+  sudo apt-get install -y openjdk-8-jdk
 }
 
 install_nodejs() {
-  sudo apt install nodejs
+  sudo apt install -y nodejs
 }
 
 install_jhipster() {
+  if which node > /dev/null
+    then
+        : #"node is installed, skipping..."
+    else
+        install_nodejs
+    fi
   npm install -g generator-jhipster
 }
 
 launch_easy_install() {
   HEIGHT=15
   WIDTH=40
-  CHOICE_HEIGHT=5
+  CHOICE_HEIGHT=6
 
   TITLE="Easy install"
   MENU="Choix des composants à installer:"
@@ -88,8 +96,9 @@ launch_easy_install() {
   "01" "Python3" OFF \
   "02" "Docker" OFF \
   "03" "OpenJdk 8" OFF \
-  "04" "Node.js" OFF \
-  "05" "Jhipster" OFF \
+  "04" "OpenJdk 11" OFF \
+  "05" "Node.js" OFF \
+  "06" "Jhipster" OFF \
   3>&1 1>&2 2>&3)
 
   case $CHOIX in
@@ -105,15 +114,21 @@ launch_easy_install() {
               install_docker $DOCKER_VERSION
               ;;&
           *03*)
-              echo "### Installation d'OpenJDK 8"
+              OPENJDK8_VERSION=$(get_version_of_package openjdk-8-jdk)
+              echo "### Installation d'OpenJDK v"OPENJDK8_VERSION
               install_openjdk8
               ;;&
           *04*)
+              OPENJDK11_VERSION=$(get_version_of_package openjdk-11-jdk)
+              echo "### Installation d'OpenJDK v"OPENJDK11_VERSION
+              install_openjdk11
+              ;;&
+          *05*)
               NODEJS_VERSION=$(get_version_of_package nodejs)
               echo "### Installation de nodejs v""$NODEJS_VERSION"
               install_nodejs
               ;;&
-          *05*)
+          *06*)
               echo "### Installation de Jhipster"
               install_jhipster
               ;;&
@@ -121,4 +136,5 @@ launch_easy_install() {
 }
 
 check_if_package_installed whiptail
+check_if_package_installed aptitude
 launch_easy_install

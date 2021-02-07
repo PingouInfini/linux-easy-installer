@@ -7,6 +7,7 @@ Affiche une fenetre permettant de sélectionner des composants à installer parm
 - Python3
 - Docker
 - OpenJdk 8
+- OpenJdk 11
 - Node.js
 - Jhipster
 
