@@ -3,6 +3,8 @@
 # use sudo command to force user to set his password at the beginning of the script
 sudo ls >/dev/null 2>&1
 
+reboot_is_needed=false
+
 apt_install_package(){
   sudo apt install -y "$1" 2>/dev/null | grep packages | cut -d '.' -f 1
 }
@@ -57,8 +59,9 @@ install_docker() {
   sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 
   #add current user to docker group
-  sudo groupadd docker
   sudo usermod -aG docker "$USER"
+
+  reboot_is_needed=true
 }
 
 install_python3() {
@@ -102,6 +105,21 @@ install_jhipster() {
 
   sudo npm install -g generator-jhipster  2> /dev/null
 }
+
+ask_for_reboot(){
+  read -r -p "Are you sure? [y/N] " response
+case "$response" in
+    [yY][eE][sS]|[yY])
+        echo "rebooting ..."
+        sleep 2
+        sudo reboot
+        ;;
+    *)
+        :
+        ;;
+esac
+}
+
 
 launch_easy_install() {
   HEIGHT=15
@@ -185,3 +203,8 @@ launch_easy_install() {
 check_if_package_installed whiptail
 check_if_package_installed aptitude
 launch_easy_install
+
+if [ "$reboot_is_needed" = true ] ; then
+    echo "Un redémarrage est nécessaire pour finaliser l'installation"
+    ask_for_reboot
+fi
