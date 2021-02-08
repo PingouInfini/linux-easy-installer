@@ -57,6 +57,7 @@ install_docker() {
   sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 
   #add current user to docker group
+  sudo groupadd docker
   sudo usermod -aG docker "$USER"
 }
 
@@ -77,6 +78,7 @@ install_openjdk11() {
 
 install_nodejs() {
   curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash - 2>/dev/null
+  sudo apt-get update 2>/dev/null | grep packages | cut -d '.' -f 1
   apt_install_package nodejs
   if which npm > /dev/null
     then
@@ -98,7 +100,7 @@ install_jhipster() {
         install_nodejs
     fi
 
-  npm install -g generator-jhipster  2> /dev/null
+  sudo npm install -g generator-jhipster  2> /dev/null
 }
 
 launch_easy_install() {
@@ -113,17 +115,15 @@ launch_easy_install() {
   "$MENU" "$HEIGHT" "$WIDTH" "$CHOICE_HEIGHT" \
   "01" "Python3" OFF \
   "02" "Docker" OFF \
-  "03" "OpenJdk 8" OFF \
-  "04" "OpenJdk 11" OFF \
+  "03" "OpenJdk8" OFF \
+  "04" "OpenJdk11" OFF \
   "05" "Node.js" OFF \
   "06" "Jhipster" OFF \
   3>&1 1>&2 2>&3)
 
   case $CHOIX in
           *01*)
-              PYTHON3_VERSION=$(get_version_of_package python3)
-              PIP_VERSION=$(get_version_of_package python3-pip)
-              echo "### Installation de Python v""$PYTHON3_VERSION"" + pip v""$PIP_VERSION"
+              echo "### Installation de Python + pip ..."
               install_python3
               echo "Terminé"
               echo "***************************************"
@@ -133,9 +133,9 @@ launch_easy_install() {
               echo ""
               ;;&
           *02*)
-              DOCKER_VERSION=1.28.2
-              echo "### Installation de Docker v"$DOCKER_VERSION
-              install_docker $DOCKER_VERSION
+              DOCKER_RELEASE=1.28.2
+              echo "### Installation de Docker ..."
+              install_docker $DOCKER_RELEASE
               echo "Terminé"
               echo "***************************************"
               echo $(docker --version)
@@ -143,8 +143,7 @@ launch_easy_install() {
               echo ""
               ;;&
           *03*)
-              OPENJDK8_VERSION=$(get_version_of_package openjdk-8-jdk)
-              echo "### Installation d'OpenJDK v""$OPENJDK8_VERSION"
+              echo "### Installation d'OpenJDK8 ..."
               install_openjdk8
               echo "Terminé"
               echo "***************************************"
@@ -153,8 +152,7 @@ launch_easy_install() {
               echo ""
               ;;&
           *04*)
-              OPENJDK11_VERSION=$(get_version_of_package openjdk-11-jdk)
-              echo "### Installation d'OpenJDK v""$OPENJDK11_VERSION"
+              echo "### Installation d'OpenJDK11 ..."
               install_openjdk11
               echo "Terminé"
               echo "***************************************"
@@ -163,8 +161,7 @@ launch_easy_install() {
               echo ""
               ;;&
           *05*)
-              NODEJS_VERSION=$(get_version_of_package nodejs)
-              echo "### Installation de nodejs v""$NODEJS_VERSION"
+              echo "### Installation de nodejs et npm ..."
               install_nodejs
               echo "Terminé"
               echo "***************************************"
@@ -174,7 +171,7 @@ launch_easy_install() {
               echo ""
               ;;&
           *06*)
-              echo "### Installation de Jhipster"
+              echo "### Installation de Jhipster ..."
               install_jhipster
               echo "Terminé"
               echo "***************************************"
