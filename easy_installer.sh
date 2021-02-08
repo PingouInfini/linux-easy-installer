@@ -6,7 +6,7 @@ sudo ls >/dev/null 2>&1
 check_if_package_installed () {
     PKG_INSTALLED=$(dpkg-query -W --showformat='${Status}\n' "$1")
     if [ "$PKG_INSTALLED" != "install ok installed" ]; then
-        sudo apt -y -qq install "$1"
+        sudo apt -y install "$1" > /dev/null
     fi
 }
 
@@ -16,14 +16,14 @@ get_version_of_package() {
 
 # Isntallation de docker, avec version en parametre $1
 install_docker() {
-  sudo apt-get update
-  sudo apt-get -qq install -y apt-transport-https ca-certificates curl software-properties-common
+  sudo apt-get update > /dev/null
+  sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common > /dev/null
   #add Docker's offical GPG key
   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
   #set stable repository
   sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
   #install docker-ce
-  sudo apt-get update && sudo apt-get -qq install -y docker-ce
+  sudo apt-get update && sudo apt-get install -y docker-ce > /dev/null
 
   #set daemon to expose interface on 2375 and enable ipv6 routing to containers
   echo '{
@@ -53,32 +53,32 @@ install_docker() {
 }
 
 install_python3() {
-  sudo apt -qq install -y python3
-  sudo apt -qq install -y python3-pip
+  sudo apt install -y python3 > /dev/null
+  sudo apt install -y python3-pip > /dev/null
 }
 
 install_openjdk8() {
-  sudo add-apt-repository ppa:openjdk-r/ppa
-  sudo apt-get update
-  sudo apt-get -qq install -y openjdk-8-jdk
+  sudo add-apt-repository ppa:openjdk-r/ppa > /dev/null
+  sudo apt-get update > /dev/null
+  sudo apt-get install -y openjdk-8-jdk > /dev/null
 }
 
 install_openjdk11() {
-  sudo apt-get -qq install -y openjdk-11-jdk
+  sudo apt-get install -y openjdk-11-jdk > /dev/null
 }
 
 install_nodejs() {
-  sudo apt -qq install -y nodejs
-}
-
-install_npm() {
-  sudo apt -qq install -y npm
+  sudo apt install -y nodejs > /dev/null
   if which npm > /dev/null
     then
         : #"npm is installed, skipping..."
     else
         install_npm
     fi
+}
+
+install_npm() {
+  sudo apt install -y npm > /dev/null
 }
 
 install_jhipster() {
@@ -89,7 +89,7 @@ install_jhipster() {
         install_nodejs
     fi
 
-  npm -qq install -g generator-jhipster
+  npm install -g generator-jhipster  > /dev/null
 }
 
 launch_easy_install() {
@@ -116,16 +116,22 @@ launch_easy_install() {
               PIP_VERSION=$(get_version_of_package python3-pip)
               echo "### Installation de Python v""$PYTHON3_VERSION"" + pip v""$PIP_VERSION"
               install_python3
+              echo "Terminé"
+              echo ""
               ;;&
           *02*)
               DOCKER_VERSION=1.28.2
               echo "### Installation de Docker v"$DOCKER_VERSION
               install_docker $DOCKER_VERSION
+              echo "Terminé"
+              echo ""
               ;;&
           *03*)
               OPENJDK8_VERSION=$(get_version_of_package openjdk-8-jdk)
               echo "### Installation d'OpenJDK v"OPENJDK8_VERSION
               install_openjdk8
+              echo "Terminé"
+              echo ""
               ;;&
           *04*)
               OPENJDK11_VERSION=$(get_version_of_package openjdk-11-jdk)
@@ -136,10 +142,14 @@ launch_easy_install() {
               NODEJS_VERSION=$(get_version_of_package nodejs)
               echo "### Installation de nodejs v""$NODEJS_VERSION"
               install_nodejs
+              echo "Terminé"
+              echo ""
               ;;&
           *06*)
               echo "### Installation de Jhipster"
               install_jhipster
+              echo "Terminé"
+              echo ""
               ;;&
   esac
 }
