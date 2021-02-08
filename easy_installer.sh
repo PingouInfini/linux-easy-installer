@@ -6,7 +6,7 @@ sudo ls >/dev/null 2>&1
 check_if_package_installed () {
     PKG_INSTALLED=$(dpkg-query -W --showformat='${Status}\n' "$1")
     if [ "$PKG_INSTALLED" != "install ok installed" ]; then
-        sudo apt -y install "$1"
+        sudo apt -y -qq install "$1"
     fi
 }
 
@@ -17,13 +17,13 @@ get_version_of_package() {
 # Isntallation de docker, avec version en parametre $1
 install_docker() {
   sudo apt-get update
-  sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+  sudo apt-get -qq install -y apt-transport-https ca-certificates curl software-properties-common
   #add Docker's offical GPG key
   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
   #set stable repository
   sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
   #install docker-ce
-  sudo apt-get update && sudo apt-get install -y docker-ce
+  sudo apt-get update && sudo apt-get -qq install -y docker-ce
 
   #set daemon to expose interface on 2375 and enable ipv6 routing to containers
   echo '{
@@ -53,24 +53,32 @@ install_docker() {
 }
 
 install_python3() {
-  sudo apt install -y python3
-  sudo apt install -y python3-pip
+  sudo apt -qq install -y python3
+  sudo apt -qq install -y python3-pip
 }
 
 install_openjdk8() {
   sudo add-apt-repository ppa:openjdk-r/ppa
   sudo apt-get update
-  sudo apt-get install -y openjdk-8-jdk
+  sudo apt-get -qq install -y openjdk-8-jdk
 }
 
-install_openjdk8() {
-  sudo add-apt-repository ppa:openjdk-r/ppa
-  sudo apt-get update
-  sudo apt-get install -y openjdk-8-jdk
+install_openjdk11() {
+  sudo apt-get -qq install -y openjdk-11-jdk
 }
 
 install_nodejs() {
-  sudo apt install -y nodejs
+  sudo apt -qq install -y nodejs
+}
+
+install_npm() {
+  sudo apt -qq install -y npm
+  if which npm > /dev/null
+    then
+        : #"npm is installed, skipping..."
+    else
+        install_npm
+    fi
 }
 
 install_jhipster() {
@@ -80,7 +88,8 @@ install_jhipster() {
     else
         install_nodejs
     fi
-  npm install -g generator-jhipster
+
+  npm -qq install -g generator-jhipster
 }
 
 launch_easy_install() {
