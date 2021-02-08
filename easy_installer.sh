@@ -3,10 +3,14 @@
 # use sudo command to force user to set his password at the beginning of the script
 sudo ls >/dev/null 2>&1
 
+apt_install_package(){
+  sudo apt install -y $1 2>/dev/null | grep packages | cut -d '.' -f 1
+}
+
 check_if_package_installed () {
     PKG_INSTALLED=$(dpkg-query -W --showformat='${Status}\n' "$1")
     if [ "$PKG_INSTALLED" != "install ok installed" ]; then
-        sudo apt -y install "$1" > /dev/null
+        apt_install_package "$1"
     fi
 }
 
@@ -17,13 +21,17 @@ get_version_of_package() {
 # Isntallation de docker, avec version en parametre $1
 install_docker() {
   sudo apt-get update > /dev/null
-  sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common > /dev/null
+  apt_install_package apt-transport-https
+  apt_install_package ca-certificates
+  apt_install_package curl
+  apt_install_package software-properties-common
   #add Docker's offical GPG key
   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
   #set stable repository
   sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
   #install docker-ce
-  sudo apt-get update && sudo apt-get install -y docker-ce > /dev/null
+  sudo apt-get update 2>/dev/null | grep packages | cut -d '.' -f 1
+  apt_install_package docker-ce
 
   #set daemon to expose interface on 2375 and enable ipv6 routing to containers
   echo '{
@@ -53,22 +61,22 @@ install_docker() {
 }
 
 install_python3() {
-  sudo apt install -y python3 > /dev/null
-  sudo apt install -y python3-pip > /dev/null
+  apt_install_package python3
+  apt_install_package python3-pip
 }
 
 install_openjdk8() {
-  sudo add-apt-repository ppa:openjdk-r/ppa > /dev/null
-  sudo apt-get update > /dev/null
-  sudo apt-get install -y openjdk-8-jdk > /dev/null
+  sudo add-apt-repository ppa:openjdk-r/ppa
+  sudo apt-get update 2>/dev/null | grep packages | cut -d '.' -f 1
+  apt_install_package openjdk-8-jdk
 }
 
 install_openjdk11() {
-  sudo apt-get install -y openjdk-11-jdk > /dev/null
+  apt_install_package openjdk-11-jdk
 }
 
 install_nodejs() {
-  sudo apt install -y nodejs > /dev/null
+  apt_install_package nodejs
   if which npm > /dev/null
     then
         : #"npm is installed, skipping..."
@@ -78,7 +86,7 @@ install_nodejs() {
 }
 
 install_npm() {
-  sudo apt install -y npm > /dev/null
+  apt_install_package npm
 }
 
 install_jhipster() {
@@ -89,7 +97,7 @@ install_jhipster() {
         install_nodejs
     fi
 
-  npm install -g generator-jhipster  > /dev/null
+  npm install -g generator-jhipster  2> /dev/null
 }
 
 launch_easy_install() {
@@ -117,6 +125,9 @@ launch_easy_install() {
               echo "### Installation de Python v""$PYTHON3_VERSION"" + pip v""$PIP_VERSION"
               install_python3
               echo "Terminé"
+              echo "***************************************"
+              echo $(python3 --version)
+              echo "***************************************"
               echo ""
               ;;&
           *02*)
@@ -124,6 +135,9 @@ launch_easy_install() {
               echo "### Installation de Docker v"$DOCKER_VERSION
               install_docker $DOCKER_VERSION
               echo "Terminé"
+              echo "***************************************"
+              echo $(docker --version)
+              echo "***************************************"
               echo ""
               ;;&
           *03*)
@@ -131,24 +145,38 @@ launch_easy_install() {
               echo "### Installation d'OpenJDK v"OPENJDK8_VERSION
               install_openjdk8
               echo "Terminé"
+              echo "***************************************"
+              echo $(java --version)
+              echo "***************************************"
               echo ""
               ;;&
           *04*)
               OPENJDK11_VERSION=$(get_version_of_package openjdk-11-jdk)
               echo "### Installation d'OpenJDK v"OPENJDK11_VERSION
               install_openjdk11
+              echo "Terminé"
+              echo "***************************************"
+              echo $(java --version)
+              echo "***************************************"
+              echo ""
               ;;&
           *05*)
               NODEJS_VERSION=$(get_version_of_package nodejs)
               echo "### Installation de nodejs v""$NODEJS_VERSION"
               install_nodejs
               echo "Terminé"
+              echo "***************************************"
+              echo $(docker --version)
+              echo "***************************************"
               echo ""
               ;;&
           *06*)
               echo "### Installation de Jhipster"
               install_jhipster
               echo "Terminé"
+              echo "***************************************"
+              echo $(jhipster --version)
+              echo "***************************************"
               echo ""
               ;;&
   esac
