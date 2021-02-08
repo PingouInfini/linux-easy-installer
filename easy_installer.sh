@@ -4,7 +4,7 @@
 sudo ls >/dev/null 2>&1
 
 apt_install_package(){
-  sudo apt install -y $1 2>/dev/null | grep packages | cut -d '.' -f 1
+  sudo apt install -y "$1" 2>/dev/null | grep packages | cut -d '.' -f 1
 }
 
 check_if_package_installed () {
@@ -20,7 +20,7 @@ get_version_of_package() {
 
 # Isntallation de docker, avec version en parametre $1
 install_docker() {
-  sudo apt-get update > /dev/null
+  sudo apt-get update 2>/dev/null | grep packages | cut -d '.' -f 1
   apt_install_package apt-transport-https
   apt_install_package ca-certificates
   apt_install_package curl
@@ -39,20 +39,20 @@ install_docker() {
   "ipv6": true,
   "fixed-cidr-v6": "2001:db8:1::/64",
   "hosts": ["unix:///var/run/docker.sock", "tcp://127.0.0.1:2375"]
-  }' | sudo tee -a /etc/docker/daemon.json
+  }' | sudo tee -a /etc/docker/daemon.json 2>/dev/null
 
   sudo mkdir -p /etc/systemd/system/docker.service.d
 
   echo '[Service]
   ExecStart=
-  ExecStart=/usr/bin/dockerd' | sudo tee -a /etc/systemd/system/docker.service.d/docker.conf
+  ExecStart=/usr/bin/dockerd' | sudo tee -a /etc/systemd/system/docker.service.d/docker.conf 2>/dev/null
 
 
   sudo systemctl daemon-reload
   sudo systemctl restart docker
 
   #install docker-compose
-  sudo curl -L "https://github.com/docker/compose/releases/download/""$1""/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  sudo curl -L "https://github.com/docker/compose/releases/download/""$1""/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose 2>/dev/null
   sudo chmod +x /usr/local/bin/docker-compose
   sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 
@@ -76,6 +76,7 @@ install_openjdk11() {
 }
 
 install_nodejs() {
+  curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash - 2>/dev/null
   apt_install_package nodejs
   if which npm > /dev/null
     then
@@ -127,6 +128,7 @@ launch_easy_install() {
               echo "Terminé"
               echo "***************************************"
               echo $(python3 --version)
+              echo $(pip3 --version)
               echo "***************************************"
               echo ""
               ;;&
@@ -142,21 +144,21 @@ launch_easy_install() {
               ;;&
           *03*)
               OPENJDK8_VERSION=$(get_version_of_package openjdk-8-jdk)
-              echo "### Installation d'OpenJDK v"OPENJDK8_VERSION
+              echo "### Installation d'OpenJDK v""$OPENJDK8_VERSION"
               install_openjdk8
               echo "Terminé"
               echo "***************************************"
-              echo $(java --version)
+              echo $(java --version | head -1)
               echo "***************************************"
               echo ""
               ;;&
           *04*)
               OPENJDK11_VERSION=$(get_version_of_package openjdk-11-jdk)
-              echo "### Installation d'OpenJDK v"OPENJDK11_VERSION
+              echo "### Installation d'OpenJDK v""$OPENJDK11_VERSION"
               install_openjdk11
               echo "Terminé"
               echo "***************************************"
-              echo $(java --version)
+              echo $(java --version | head -1)
               echo "***************************************"
               echo ""
               ;;&
@@ -166,7 +168,8 @@ launch_easy_install() {
               install_nodejs
               echo "Terminé"
               echo "***************************************"
-              echo $(docker --version)
+              echo "node" $(node --version)
+              echo "npm" $(npm --version)
               echo "***************************************"
               echo ""
               ;;&
