@@ -106,6 +106,10 @@ install_jhipster() {
   sudo npm install -g generator-jhipster  2> /dev/null
 }
 
+install_maven() {
+  apt_install_package maven
+}
+
 ask_for_reboot(){
   read -r -p "Are you sure? [y/N] " response
 case "$response" in
@@ -124,7 +128,7 @@ esac
 launch_easy_install() {
   HEIGHT=15
   WIDTH=40
-  CHOICE_HEIGHT=6
+  CHOICE_HEIGHT=7
 
   TITLE="Easy install"
   MENU="Choix des composants à installer:"
@@ -137,6 +141,7 @@ launch_easy_install() {
   "04" "OpenJdk11" OFF \
   "05" "Node.js" OFF \
   "06" "Jhipster" OFF \
+  "07" "Maven" OFF \
   3>&1 1>&2 2>&3)
 
   case $CHOIX in
@@ -194,6 +199,15 @@ launch_easy_install() {
               echo "Terminé"
               echo "***************************************"
               echo $(jhipster --version)
+              echo "***************************************"
+              echo ""
+              ;;&
+          *07*)
+              echo "### Installation de Maven ..."
+              install_maven
+              echo "Terminé"
+              echo "***************************************"
+              echo $(mvn --version)
               echo "***************************************"
               echo ""
               ;;&

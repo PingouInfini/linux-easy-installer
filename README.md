@@ -10,6 +10,7 @@ Affiche une fenetre permettant de sélectionner des composants à installer parm
 - OpenJdk 11
 - Node.js
 - Jhipster
+- Maven
 
 Usage
 =====
