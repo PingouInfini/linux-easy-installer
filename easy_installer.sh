@@ -64,6 +64,40 @@ install_docker() {
   reboot_is_needed=true
 }
 
+install_pgadmin4() {
+  # Install the public key for the repository (if not done previously):
+  sudo curl https://www.pgadmin.org/static/packages_pgadmin_org.pub | sudo apt-key add
+
+  # Create the repository configuration file:
+  sudo sh -c 'echo "deb https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/$(lsb_release -cs) pgadmin4 main" > /etc/apt/sources.list.d/pgadmin4.list && apt update'
+
+  # Install for desktop mode only:
+  apt_install_package pgadmin4-desktop
+
+  # Add in /usr/bin & /usr/local/bin
+  sudo ln -s /usr/pgadmin4/bin/pgadmin4 /usr/local/bin/pgadmin4
+  sudo ln -s /usr/pgadmin4/bin/pgadmin4 /usr/bin/pgadmin4
+}
+
+install_smartgit() {
+  mkdir ~/Apps
+  # Get Smartgit 19
+  wget -O ~/Apps/smartgit-linux-19_1_8.tar.gz https://www.syntevo.com/downloads/smartgit/smartgit-linux-19_1_8.tar.gz
+  # Unarchive it
+  tar xzf ~/Apps/smartgit-linux-19_1_8.tar.gz -C ~/Apps
+  # Remove archive
+  rm -rf ~/Apps/smartgit-linux-19_1_8.tar.gz
+
+  # Script for licence
+  cp ~/.config/smartgit/19.1/preferences.yml ~/.config/smartgit/19.1/preferences.bck
+  echo "rm -rf ~/.config/smartgit/19.1/preferences.yml" > ~/Apps/smartgit/remove-licence.sh
+  chmod +x ~/Apps/smartgit/remove-licence.sh
+
+  # Add in /usr/bin & /usr/local/bin
+  sudo ln -s ~/Apps/smartgit/bin/smartgit.sh /usr/local/bin/smartgit
+  sudo ln -s ~/Apps/smartgit/bin/smartgit.sh /usr/bin/smartgit
+}
+
 install_python3() {
   apt_install_package python3
   apt_install_package python3-pip
@@ -128,7 +162,7 @@ esac
 launch_easy_install() {
   HEIGHT=15
   WIDTH=40
-  CHOICE_HEIGHT=7
+  CHOICE_HEIGHT=9
 
   TITLE="Easy install"
   MENU="Choix des composants à installer:"
@@ -137,11 +171,13 @@ launch_easy_install() {
   "$MENU" "$HEIGHT" "$WIDTH" "$CHOICE_HEIGHT" \
   "01" "Python3" OFF \
   "02" "Docker" OFF \
-  "03" "OpenJdk8" OFF \
-  "04" "OpenJdk11" OFF \
-  "05" "Node.js" OFF \
-  "06" "Jhipster" OFF \
-  "07" "Maven" OFF \
+  "03" "PgAdmin4" OFF \
+  "04" "Smartgit" OFF \
+  "05" "OpenJdk8" OFF \
+  "06" "OpenJdk11" OFF \
+  "07" "Node.js" OFF \
+  "08" "Jhipster" OFF \
+  "09" "Maven" OFF \
   3>&1 1>&2 2>&3)
 
   case $CHOIX in
@@ -166,6 +202,24 @@ launch_easy_install() {
               echo ""
               ;;&
           *03*)
+              echo "### Installation de PgAdmin4 ..."
+              install_pgadmin4
+              echo "Terminé"
+              echo "***************************************"
+              echo $(pgadmin4 -version)
+              echo "***************************************"
+              echo ""
+              ;;&
+          *04*)
+              echo "### Installation de Smartgit ..."
+              install_smartgit
+              echo "Terminé"
+              echo "***************************************"
+              echo $(cat ~Apps/smartgit/changelog.txt | head -1)
+              echo "***************************************"
+              echo ""
+              ;;&
+          *05*)
               echo "### Installation d'OpenJDK8 ..."
               install_openjdk8
               echo "Terminé"
@@ -174,7 +228,7 @@ launch_easy_install() {
               echo "***************************************"
               echo ""
               ;;&
-          *04*)
+          *06*)
               echo "### Installation d'OpenJDK11 ..."
               install_openjdk11
               echo "Terminé"
@@ -183,7 +237,7 @@ launch_easy_install() {
               echo "***************************************"
               echo ""
               ;;&
-          *05*)
+          *07*)
               echo "### Installation de nodejs et npm ..."
               install_nodejs
               echo "Terminé"
@@ -193,7 +247,7 @@ launch_easy_install() {
               echo "***************************************"
               echo ""
               ;;&
-          *06*)
+          *08*)
               echo "### Installation de Jhipster ..."
               install_jhipster
               echo "Terminé"
@@ -202,7 +256,7 @@ launch_easy_install() {
               echo "***************************************"
               echo ""
               ;;&
-          *07*)
+          *09*)
               echo "### Installation de Maven ..."
               install_maven
               echo "Terminé"

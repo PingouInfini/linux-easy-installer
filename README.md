@@ -6,6 +6,8 @@ easy_installer.sh
 Affiche une fenetre permettant de sélectionner des composants à installer parmi:
 - Python3
 - Docker
+- PgAdmin4
+- Smartgit
 - OpenJdk 8
 - OpenJdk 11
 - Node.js
