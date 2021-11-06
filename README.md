@@ -15,6 +15,11 @@ Affiche une fenetre permettant de sélectionner des composants à installer parm
 Usage
 =====
 ```
+# Téléchargement du script dans le répertoire courant
+wget https://raw.githubusercontent.com/PingouInfini/LinuxEasyInstaller/main/easy_installer.sh
+chmod +x easy_installer.sh
+
+# Lancement de l'installer
 ./easy_installer.sh
 ```
 
