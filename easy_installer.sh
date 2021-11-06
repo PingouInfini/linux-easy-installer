@@ -156,7 +156,7 @@ launch_easy_install() {
               echo ""
               ;;&
           *02*)
-              DOCKER_RELEASE=1.28.2
+              DOCKER_RELEASE=1.29.2
               echo "### Installation de Docker ..."
               install_docker $DOCKER_RELEASE
               echo "Terminé"
