@@ -20,7 +20,7 @@ get_version_of_package() {
   aptitude versions "$1" |head -2 |tail -1 | awk '{print $2}'
 }
 
-# Isntallation de docker, avec version en parametre $1
+# Installation de docker, avec version en parametre $1
 install_docker() {
   sudo apt-get update 2>/dev/null | grep packages | cut -d '.' -f 1
   apt_install_package apt-transport-https
@@ -192,7 +192,8 @@ launch_easy_install() {
               echo ""
               ;;&
           *02*)
-              DOCKER_RELEASE=1.29.2
+              # last version: https://github.com/docker/compose/releases/latest
+              DOCKER_RELEASE=2.6.1
               echo "### Installation de Docker ..."
               install_docker $DOCKER_RELEASE
               echo "Terminé"
