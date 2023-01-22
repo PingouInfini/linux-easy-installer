@@ -193,7 +193,7 @@ launch_easy_install() {
               ;;&
           *02*)
               # last version: https://github.com/docker/compose/releases/latest
-              DOCKER_RELEASE=2.6.0
+              DOCKER_RELEASE=2.15.1
               echo "### Installation de Docker ..."
               install_docker $DOCKER_RELEASE
               echo "Terminé"
