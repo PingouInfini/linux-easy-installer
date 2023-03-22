@@ -79,23 +79,39 @@ install_pgadmin4() {
   sudo ln -s /usr/pgadmin4/bin/pgadmin4 /usr/bin/pgadmin4
 }
 
-install_smartgit() {
-  mkdir ~/Apps
-  # Get Smartgit 19
-  wget -O ~/Apps/smartgit-linux-19_1_8.tar.gz https://www.syntevo.com/downloads/smartgit/smartgit-linux-19_1_8.tar.gz
+install_intellij() {
+  mkdir -p ~/apps
+  # Get IntelliJ Community latest
+  wget -O ~/apps/ideaIC.tar.gz $1
   # Unarchive it
-  tar xzf ~/Apps/smartgit-linux-19_1_8.tar.gz -C ~/Apps
+  tar xzf ~/apps/ideaIC.tar.gz -C ~/apps
+  mv ~/apps/idea-IU* ~/apps/IntelliJ-IDEA-Community
   # Remove archive
-  rm -rf ~/Apps/smartgit-linux-19_1_8.tar.gz
+  rm -rf ~/apps/ideaIC.tar.gz
+  
+  # Add in /usr/bin & /usr/local/bin
+  sudo ln -s ~/apps/IntelliJ-IDEA-Community/bin/idea.sh /usr/local/bin/idea
+  sudo ln -s ~/apps/IntelliJ-IDEA-Community/bin/idea.sh /usr/bin/idea
+}
+
+
+install_smartgit() {
+  mkdir -p ~/apps
+  # Get Smartgit 19
+  wget -O ~/apps/smartgit-linux-19_1_8.tar.gz https://www.syntevo.com/downloads/smartgit/archive/smartgit-linux-19_1_8.tar.gz
+  # Unarchive it
+  tar xzf ~/apps/smartgit-linux-19_1_8.tar.gz -C ~/apps
+  # Remove archive
+  rm -rf ~/apps/smartgit-linux-19_1_8.tar.gz
 
   # Script for licence
   cp ~/.config/smartgit/19.1/preferences.yml ~/.config/smartgit/19.1/preferences.bck
-  echo "rm -rf ~/.config/smartgit/19.1/preferences.yml" > ~/Apps/smartgit/remove-licence.sh
-  chmod +x ~/Apps/smartgit/remove-licence.sh
+  echo "rm -rf ~/.config/smartgit/19.1/preferences.yml" > ~/apps/smartgit/remove-licence.sh
+  chmod +x ~/apps/smartgit/remove-licence.sh
 
   # Add in /usr/bin & /usr/local/bin
-  sudo ln -s ~/Apps/smartgit/bin/smartgit.sh /usr/local/bin/smartgit
-  sudo ln -s ~/Apps/smartgit/bin/smartgit.sh /usr/bin/smartgit
+  sudo ln -s ~/apps/smartgit/bin/smartgit.sh /usr/local/bin/smartgit
+  sudo ln -s ~/apps/smartgit/bin/smartgit.sh /usr/bin/smartgit
 }
 
 install_python3() {
@@ -161,8 +177,8 @@ esac
 
 launch_easy_install() {
   HEIGHT=15
-  WIDTH=40
-  CHOICE_HEIGHT=9
+  WIDTH=50
+  CHOICE_HEIGHT=10
 
   TITLE="Easy install"
   MENU="Choix des composants à installer:"
@@ -172,12 +188,13 @@ launch_easy_install() {
   "01" "Python3" OFF \
   "02" "Docker" OFF \
   "03" "PgAdmin4" OFF \
-  "04" "Smartgit" OFF \
-  "05" "OpenJdk8" OFF \
-  "06" "OpenJdk11" OFF \
-  "07" "Node.js" OFF \
-  "08" "Jhipster" OFF \
-  "09" "Maven" OFF \
+  "04" "IntelliJ Community" OFF \
+  "05" "Smartgit" OFF \
+  "06" "OpenJdk8" OFF \
+  "07" "OpenJdk11" OFF \
+  "08" "Node.js" OFF \
+  "09" "Jhipster" OFF \
+  "10" "Maven" OFF \
   3>&1 1>&2 2>&3)
 
   case $CHOIX in
@@ -193,7 +210,10 @@ launch_easy_install() {
               ;;&
           *02*)
               # last version: https://github.com/docker/compose/releases/latest
-              DOCKER_RELEASE=2.15.1
+              check_if_package_installed curl
+              response=$(curl -sI https://github.com/docker/compose/releases/latest)
+              location=$(echo "$response" |grep -i location |awk '{print $2}')
+              DOCKER_RELEASE=$(echo $location |grep -oP 'v\d+\.\d+\.\d+')
               echo "### Installation de Docker ..."
               install_docker $DOCKER_RELEASE
               echo "Terminé"
@@ -212,15 +232,28 @@ launch_easy_install() {
               echo ""
               ;;&
           *04*)
-              echo "### Installation de Smartgit ..."
-              install_smartgit
+              echo "### Installation d'IntelliJ Community ..."
+              # Get IntelliJVersion
+              check_if_package_installed jq
+              response=$(curl https://data.services.jetbrains.com/products/releases?code=IIU&latest=true&type=release)
+              link=$(echo $response | jq -r '.IIU[0].downloads.linux.link')
+              install_intellij $link
               echo "Terminé"
               echo "***************************************"
-              echo $(cat ~Apps/smartgit/changelog.txt | head -1)
+              echo $(cat ~/apps/IntelliJ-IDEA-Community/build.txt)
               echo "***************************************"
               echo ""
               ;;&
           *05*)
+              echo "### Installation de Smartgit ..."
+              install_smartgit
+              echo "Terminé"
+              echo "***************************************"
+              echo $(cat ~apps/smartgit/changelog.txt | head -1)
+              echo "***************************************"
+              echo ""
+              ;;&
+          *06*)
               echo "### Installation d'OpenJDK8 ..."
               install_openjdk8
               echo "Terminé"
@@ -229,7 +262,7 @@ launch_easy_install() {
               echo "***************************************"
               echo ""
               ;;&
-          *06*)
+          *07*)
               echo "### Installation d'OpenJDK11 ..."
               install_openjdk11
               echo "Terminé"
@@ -238,7 +271,7 @@ launch_easy_install() {
               echo "***************************************"
               echo ""
               ;;&
-          *07*)
+          *08*)
               echo "### Installation de nodejs et npm ..."
               install_nodejs
               echo "Terminé"
@@ -248,7 +281,7 @@ launch_easy_install() {
               echo "***************************************"
               echo ""
               ;;&
-          *08*)
+          *09*)
               echo "### Installation de Jhipster ..."
               install_jhipster
               echo "Terminé"
@@ -257,7 +290,7 @@ launch_easy_install() {
               echo "***************************************"
               echo ""
               ;;&
-          *09*)
+          *10*)
               echo "### Installation de Maven ..."
               install_maven
               echo "Terminé"
