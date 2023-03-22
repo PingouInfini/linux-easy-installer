@@ -85,7 +85,7 @@ install_intellij() {
   wget -O ~/apps/ideaIC.tar.gz $1
   # Unarchive it
   tar xzf ~/apps/ideaIC.tar.gz -C ~/apps
-  mv ~/apps/idea-IU* ~/apps/IntelliJ-IDEA-Community
+  mv ~/apps/idea-IC* ~/apps/IntelliJ-IDEA-Community
   # Remove archive
   rm -rf ~/apps/ideaIC.tar.gz
   
@@ -235,8 +235,8 @@ launch_easy_install() {
               echo "### Installation d'IntelliJ Community ..."
               # Get IntelliJVersion
               check_if_package_installed jq
-              response=$(curl https://data.services.jetbrains.com/products/releases?code=IIU&latest=true&type=release)
-              link=$(echo $response | jq -r '.IIU[0].downloads.linux.link')
+              response=$(curl https://data.services.jetbrains.com/products/releases?code=IIC&latest=true&type=release)
+              link=$(echo $response | jq -r '.IIC[0].downloads.linux.link')
               install_intellij $link
               echo "Terminé"
               echo "***************************************"
