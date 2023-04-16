@@ -249,7 +249,7 @@ launch_easy_install() {
               install_smartgit
               echo "Terminé"
               echo "***************************************"
-              echo $(cat ~apps/smartgit/changelog.txt | head -1)
+              echo $(cat ~/apps/smartgit/changelog.txt | head -1)
               echo "***************************************"
               echo ""
               ;;&
