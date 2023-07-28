@@ -56,6 +56,7 @@ install_docker() {
   #install docker-compose
   sudo curl -L "https://github.com/docker/compose/releases/download/""$1""/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose 2>/dev/null
   sudo chmod +x /usr/local/bin/docker-compose
+  sudo rm /usr/bin/docker-compose
   sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 
   #add current user to docker group
@@ -75,6 +76,8 @@ install_pgadmin4() {
   apt_install_package pgadmin4-desktop
 
   # Add in /usr/bin & /usr/local/bin
+  sudo rm /usr/local/bin/pgadmin4
+  sudo rm /usr/bin/pgadmin4
   sudo ln -s /usr/pgadmin4/bin/pgadmin4 /usr/local/bin/pgadmin4
   sudo ln -s /usr/pgadmin4/bin/pgadmin4 /usr/bin/pgadmin4
 }
@@ -90,6 +93,8 @@ install_intellij() {
   rm -rf ~/apps/ideaIC.tar.gz
   
   # Add in /usr/bin & /usr/local/bin
+  sudo rm /usr/local/bin/idea
+  sudo rm /usr/bin/idea
   sudo ln -s ~/apps/IntelliJ-IDEA-Community/bin/idea.sh /usr/local/bin/idea
   sudo ln -s ~/apps/IntelliJ-IDEA-Community/bin/idea.sh /usr/bin/idea
 }
@@ -110,6 +115,8 @@ install_smartgit() {
   chmod +x ~/apps/smartgit/remove-licence.sh
 
   # Add in /usr/bin & /usr/local/bin
+  sudo rm /usr/local/bin/smartgit
+  sudo rm usr/bin/smartgit
   sudo ln -s ~/apps/smartgit/bin/smartgit.sh /usr/local/bin/smartgit
   sudo ln -s ~/apps/smartgit/bin/smartgit.sh /usr/bin/smartgit
 }
