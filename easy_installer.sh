@@ -137,7 +137,7 @@ install_openjdk11() {
 }
 
 install_nodejs() {
-  curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash - 2>/dev/null
+  curl -sL https://deb.nodesource.com/setup_current.x | sudo -E bash - 2>/dev/null
   sudo apt-get update 2>/dev/null | grep packages | cut -d '.' -f 1
   apt_install_package nodejs
   if which npm > /dev/null
