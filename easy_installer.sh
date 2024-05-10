@@ -126,14 +126,22 @@ install_python3() {
   response=$(curl -sL "https://docs.python.org/_static/documentation_options.js")
   version=$(echo "$response" | grep -oP "VERSION: '\K[^']+" | sed 's/\.[^.]*$//')
 
+  apt_install_package software-properties-common
+
   echo | sudo add-apt-repository ppa:deadsnakes/ppa
 
   # python  
-  apt_install_package python$version
+  apt_install_package python$version python$version-distutils python$version-venv
+  
+  # upgrade python3 command to downloaded version
+  current_version=$(python3 --version 2>&1 | cut -d' ' -f2)
+  if [[ "$current_version" != "$version"* ]]; then
+    sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python$version 1
+    sudo update-alternatives --config python3 <<< "1"
+  fi
 
   # pip
-  curl https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py
-  python3 /tmp/get-pip.py
+  curl -sS https://bootstrap.pypa.io/get-pip.py | python$version
 }
 
 install_openjdk8() {
