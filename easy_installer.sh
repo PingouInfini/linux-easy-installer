@@ -30,7 +30,7 @@ install_docker() {
   #add Docker's offical GPG key
   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
   #set stable repository
-  sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  echo | sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
   #install docker-ce
   sudo apt-get update 2>/dev/null | grep packages | cut -d '.' -f 1
   apt_install_package docker-ce
@@ -122,8 +122,18 @@ install_smartgit() {
 }
 
 install_python3() {
-  apt_install_package python3
-  apt_install_package python3-pip
+  # Retrieve last stable release for python
+  response=$(curl -sL "https://docs.python.org/_static/documentation_options.js")
+  version=$(echo "$response" | grep -oP "VERSION: '\K[^']+" | sed 's/\.[^.]*$//')
+
+  echo | sudo add-apt-repository ppa:deadsnakes/ppa
+
+  # python  
+  apt_install_package python$version
+
+  # pip
+  curl https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py
+  python3 /tmp/get-pip.py
 }
 
 install_openjdk8() {
