@@ -97,6 +97,34 @@ install_intellij() {
   sudo rm /usr/bin/idea
   sudo ln -s ~/apps/IntelliJ-IDEA-Community/bin/idea.sh /usr/local/bin/idea
   sudo ln -s ~/apps/IntelliJ-IDEA-Community/bin/idea.sh /usr/bin/idea
+    
+  # Définir les chemins
+  INTELLIJ_EXEC="$HOME/apps/IntelliJ-IDEA-Community/bin/idea.sh"
+  INTELLIJ_ICON="$HOME/apps/IntelliJ-IDEA-Community/bin/idea.svg"
+  DESKTOP_FILE="$HOME/.local/share/applications/intellij-idea-community.desktop"
+  
+  # Créer le contenu du fichier .desktop
+  DESKTOP_ENTRY="[Desktop Entry]
+  Name=IntelliJ
+  Comment=IntelliJ IDEA Community Edition
+  Exec=$INTELLIJ_EXEC
+  Icon=$INTELLIJ_ICON
+  Terminal=false
+  Type=Application
+  Categories=Development;IDE;
+  "
+  
+  # Créer le répertoire si nécessaire
+  mkdir -p "$(dirname "$DESKTOP_FILE")"
+ 
+  # Écrire le contenu dans le fichier .desktop
+  echo "$DESKTOP_ENTRY" > "$DESKTOP_FILE"
+  
+  # Rendre le fichier exécutable
+  chmod +x "$DESKTOP_FILE"
+  
+  # Actualiser la base de données des applications
+  update-desktop-database "$(dirname "$DESKTOP_FILE")"
 }
 
 
@@ -119,6 +147,34 @@ install_smartgit() {
   sudo rm usr/bin/smartgit
   sudo ln -s ~/apps/smartgit/bin/smartgit.sh /usr/local/bin/smartgit
   sudo ln -s ~/apps/smartgit/bin/smartgit.sh /usr/bin/smartgit
+  
+  # Définir les chemins
+  SMARTGIT_EXEC="$HOME/apps/smartgit/bin/smartgit.sh"
+  SMARTGIT_ICON="$HOME/apps/smartgit/bin/smartgit.svg"
+  DESKTOP_FILE="$HOME/.local/share/applications/smartgit.desktop"
+  
+  # Créer le contenu du fichier .desktop
+  DESKTOP_ENTRY="[Desktop Entry]
+  Name=SmartGit
+  Comment=SmartGit Version Control
+  Exec=$SMARTGIT_EXEC
+  Icon=$SMARTGIT_ICON
+  Terminal=false
+  Type=Application
+  Categories=Development;IDE;
+  "
+
+  # Créer le répertoire si nécessaire
+  mkdir -p "$(dirname "$DESKTOP_FILE")"
+  
+  # Écrire le contenu dans le fichier .desktop
+  echo "$DESKTOP_ENTRY" > "$DESKTOP_FILE"
+  
+  # Rendre le fichier exécutable
+  chmod +x "$DESKTOP_FILE"
+  
+  # Actualiser la base de données des applications
+  update-desktop-database "$(dirname "$DESKTOP_FILE")"
 }
 
 install_python3() {
