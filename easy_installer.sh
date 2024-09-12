@@ -95,8 +95,8 @@ install_intellij() {
   # Add in /usr/bin & /usr/local/bin
   sudo rm /usr/local/bin/idea
   sudo rm /usr/bin/idea
-  sudo ln -s ~/apps/IntelliJ-IDEA-Community/bin/idea.sh /usr/local/bin/idea
-  sudo ln -s ~/apps/IntelliJ-IDEA-Community/bin/idea.sh /usr/bin/idea
+  sudo ln -s ~/apps/IntelliJ-IDEA-Community/bin/idea /usr/local/bin/idea
+  sudo ln -s ~/apps/IntelliJ-IDEA-Community/bin/idea /usr/bin/idea
     
   # Définir les chemins
   INTELLIJ_EXEC="$HOME/apps/IntelliJ-IDEA-Community/bin/idea.sh"
