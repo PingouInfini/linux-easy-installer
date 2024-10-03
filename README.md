@@ -29,6 +29,8 @@ chmod +x easy_installer.sh
 ---
 package_downloader.sh
 ===========
-Renseigné dans la variable "LIB_LIST" la liste des package à télécharger
- 
-Ceux-ci et leurs dpendances seront téléchargés et stockés dans des répertoires nommés selon les packages 
+Affiche une fenêtre avec différents choix permettant de:
+- télécharger des packages spécifiés, séparés par un `;`
+- installer des packages présents dans les répertoires présents à côté du script (uniquement les répertoires ne contenant que des `.deb` ou `.rpm`)
+- supprimer les répertoires ne contenant que des `.deb` ou `.rpm` présents à côté du script
+- quitter
