@@ -51,18 +51,30 @@ if [ "$OPTION" == "01" ]; then
 
   # Boucler sur chaque package et le télécharger
   for lib in "${PACKAGE_LIST[@]}"; do
-    echo "#### Téléchargement de "+$lib+" ####"
+    echo "#### Téléchargement de $lib ####"
 
-    mkdir -p $lib && cd $lib
+    # Créer un répertoire pour le package et un sous-répertoire pour les dépendances
+    mkdir -p "$lib/required"
+
+    # Télécharger les dépendances dans le répertoire "required"
+    cd "$lib/required"
 
     if [[ "$OS" == "ubuntu" || "$OS" == "pop" ]]; then
-      apt-get download $(apt-cache depends --recurse --no-recommends --no-suggests --no-conflicts --no-breaks --no-replaces --no-pre-depends $lib | grep "^\w" | sort -u)
+      apt-get download $(apt-cache depends --recurse --no-recommends --no-suggests --no-conflicts --no-breaks --no-replaces --no-pre-depends "$lib" | grep "^\w" | sort -u)
     elif [[ "$OS" == "almalinux" || "$OS" == "rhel" ]]; then
-      dnf download $(dnf repoquery --requires --resolve $lib | grep -vE '^(installonly|local)')
+      dnf download $(dnf repoquery --requires --resolve "$lib" | grep -vE '^(installonly|local)')
+    fi
+
+    cd ..
+
+    # Télécharger le package principal dans le répertoire principal
+    if [[ "$OS" == "ubuntu" || "$OS" == "pop" ]]; then
+      apt-get download "$lib"
+    elif [[ "$OS" == "almalinux" || "$OS" == "rhel" ]]; then
+      dnf download "$lib"
     fi
 
     echo ""
-    cd ..
   done
 
 # Si l'option "Install packages" est choisie
@@ -114,11 +126,32 @@ elif [ "$OPTION" == "03" ]; then
     for dir in */; do
       dir=${dir%/}  # Supprimer le slash à la fin du nom de répertoire
 
-      # Vérifier que tous les fichiers sont soit des .deb, soit des .rpm, selon l'OS
+      # Fonction pour vérifier si un répertoire ne contient que des .deb ou des .rpm
+      function cleanable_dir {
+        local directory="$1"
+        local ext="$2"
+        
+        # Récupérer tous les fichiers et sous-répertoires
+        local contents=$(ls "$directory")
+        
+        # Vérifier si tous les fichiers correspondent à l'extension donnée (.deb ou .rpm)
+        for item in $contents; do
+          if [[ -d "$directory/$item" ]]; then
+            # Si c'est un sous-répertoire, vérifier récursivement
+            cleanable_dir "$directory/$item" "$ext" || return 1
+          elif [[ ! "$item" == *"$ext" ]]; then
+            # Si ce n'est pas un fichier avec l'extension attendue, ne pas supprimer
+            return 1
+          fi
+        done
+        return 0
+      }
+
+      # Vérifier que tous les fichiers dans le répertoire ou sous-répertoires sont soit des .deb, soit des .rpm, selon l'OS
       cd "$dir"
       if [[ "$OS" == "ubuntu" || "$OS" == "pop" ]]; then
-        # Vérifier si seuls des .deb sont présents
-        if [ "$(ls | grep -v '.deb')" == "" ]; then
+        # Si tous les fichiers sont des .deb (y compris dans les sous-répertoires)
+        if cleanable_dir "." ".deb"; then
           cd ..
           rm -rf "$dir"
           echo "Répertoire $dir supprimé."
@@ -126,8 +159,8 @@ elif [ "$OPTION" == "03" ]; then
           cd ..
         fi
       elif [[ "$OS" == "almalinux" || "$OS" == "rhel" ]]; then
-        # Vérifier si seuls des .rpm sont présents
-        if [ "$(ls | grep -v '.rpm')" == "" ]; then
+        # Si tous les fichiers sont des .rpm (y compris dans les sous-répertoires)
+        if cleanable_dir "." ".rpm"; then
           cd ..
           rm -rf "$dir"
           echo "Répertoire $dir supprimé."
