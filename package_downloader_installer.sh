@@ -74,6 +74,8 @@ if [ "$OPTION" == "01" ]; then
       dnf download "$lib"
     fi
 
+    cd ..
+
     echo ""
   done
 
