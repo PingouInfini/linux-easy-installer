@@ -99,7 +99,7 @@ install_intellij() {
   sudo ln -s ~/apps/IntelliJ-IDEA-Community/bin/idea /usr/bin/idea
     
   # Définir les chemins
-  INTELLIJ_EXEC="$HOME/apps/IntelliJ-IDEA-Community/bin/idea.sh"
+  INTELLIJ_EXEC="$HOME/apps/IntelliJ-IDEA-Community/bin/idea"
   INTELLIJ_ICON="$HOME/apps/IntelliJ-IDEA-Community/bin/idea.svg"
   DESKTOP_FILE="$HOME/.local/share/applications/intellij-idea-community.desktop"
   
