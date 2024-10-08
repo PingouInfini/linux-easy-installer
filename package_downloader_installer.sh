@@ -44,6 +44,5 @@ fi
 # Revenir au répertoire initial
 cd "$START_DIR" || exit 1
 
-# Lancer inquirer.js
-node lib/inquirer.js
-
+# Lancer package_downloader_installer.js
+node lib/package_downloader_installer.js
